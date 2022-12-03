@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memolang/clients/subject_client.dart';
 import 'package:memolang/models/token_storage.dart';
 import 'package:memolang/pages/subjects_page.dart';
 import 'package:splash_view/splash_view.dart';
@@ -15,9 +16,10 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
   var tokenLoadingFailed = false;
   var shouldGoToSubjectsPage = false;
-  String? token = null;
+  String? token;
   var subjects = <Subject>[];
   static const splashMinMilliSeconds = 5000;
+  var subjectClient = SubjectClient();
 
   Future<void> loadSubjects() async {
     var stopWatch = Stopwatch();
@@ -29,11 +31,11 @@ class _SplashPageState extends State<SplashPage> {
       });
       return;
     }
+    var fetchedSubjects = await subjectClient.listSubjects(token!);
     setStateWithMinSplashTime(stopWatch, () {
-      subjects = []; // TODO: Fetch!!
+      subjects = fetchedSubjects;
       shouldGoToSubjectsPage = true;
     });
-    // load subjects here.
   }
 
   void setStateWithMinSplashTime(

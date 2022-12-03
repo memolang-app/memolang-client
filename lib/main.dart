@@ -17,6 +17,7 @@ void main() {
           backgroundColor: red,
           centerTitle: true,
       ),
+      primarySwatch: Colors.red,
       floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: red),
     ),
   ));

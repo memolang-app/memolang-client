@@ -3,26 +3,18 @@ import 'package:flutter_login/flutter_login.dart';
 import 'package:memolang/clients/auth_client.dart';
 import 'package:memolang/models/token_storage.dart';
 import 'package:memolang/pages/splash_page.dart';
-import 'package:memolang/pages/subjects_page.dart';
 import 'package:memolang/style.dart';
-
-const users = const {
-  'dribbble@gmail.com': '12345',
-  'hunter@gmail.com': 'hunter',
-};
 
 class LoginForm extends StatelessWidget {
   AuthClient authClient;
 
-  LoginForm({ required this.authClient });
+  LoginForm({required this.authClient});
 
   Duration get loginTime => Duration(milliseconds: 2250);
 
   Future<String?> _login(LoginData data) async {
-    var authResult = await authClient.login(Credentials(
-        username: data.name,
-        password: data.password
-    ));
+    var authResult = await authClient
+        .login(Credentials(username: data.name, password: data.password));
     if (authResult.token != null) {
       TokenStorage.writeToken(authResult.token!);
       return null;
@@ -32,8 +24,8 @@ class LoginForm extends StatelessWidget {
 
   Future<String?> _signupUser(SignupData data) async {
     var authResult = await authClient.register(Credentials(
-        username: data.name!,
-        password: data.password!,
+      username: data.name!,
+      password: data.password!,
     ));
     if (authResult.token != null) {
       TokenStorage.writeToken(authResult.token!);
@@ -45,9 +37,6 @@ class LoginForm extends StatelessWidget {
   Future<String?> _recoverPassword(String name) {
     debugPrint('Name: $name');
     return Future.delayed(loginTime).then((_) {
-      if (!users.containsKey(name)) {
-        return 'User not exists';
-      }
       return null;
     });
   }
@@ -75,7 +64,6 @@ class LoginForm extends StatelessWidget {
       onRecoverPassword: _recoverPassword,
       hideForgotPasswordButton: true,
       userType: LoginUserType.name,
-
       theme: LoginTheme(
           pageColorLight: backgroundColor,
           pageColorDark: backgroundColor,
@@ -85,9 +73,7 @@ class LoginForm extends StatelessWidget {
             filled: true,
             fillColor: backgroundColor,
             focusColor: backgroundColor,
-          )
-      ),
+          )),
     );
   }
 }
-
