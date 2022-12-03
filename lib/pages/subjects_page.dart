@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:memolang/clients/subject_client.dart';
 import 'package:memolang/components/subject_list.dart';
 import 'package:memolang/models/subject.dart';
 
@@ -18,9 +19,16 @@ class SubjectsPage extends StatefulWidget {
 class _SubjectsPageState extends State<SubjectsPage> {
   SubjectsPageArguments? subjectsPageArguments;
   TextEditingController subjectNameInput = TextEditingController();
+  SubjectClient subjectClient = SubjectClient();
 
-  void _submitForm(subjectName) {
-    Navigator.of(context).pop(Subject(name: subjectName));
+  void _submitForm(subjectName) async {
+    print('token is ${subjectsPageArguments?.token}');
+    var subject = await subjectClient.createSubject(subjectsPageArguments!.token, subjectName);
+    if (subject != null) {
+      Navigator.of(context).pop(subject);
+    } else {
+      Navigator.of(context).pop();
+    }
     subjectNameInput.clear();
   }
 
