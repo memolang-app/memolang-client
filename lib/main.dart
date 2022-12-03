@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memolang/pages/credentials_page.dart';
 import 'package:memolang/pages/splash_page.dart';
 import 'package:memolang/pages/subjects_page.dart';
 
@@ -7,6 +8,7 @@ void main() {
     routes: {
       '/': (ctx) => SplashPage(),
       '/subjects': (ctx) => SubjectsPage(),
+      '/credentials': (ctx) => CredentialsPage(),
     },
   ));
 }
