@@ -14,24 +14,32 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   var tokenLoadingFailed = false;
+  var shouldGoToSubjectsPage = false;
+  String? token = null;
   var subjects = <Subject>[];
   static const splashMinMilliSeconds = 5000;
 
   Future<void> loadSubjects() async {
     var stopWatch = Stopwatch();
     stopWatch.start();
-    var token = await TokenStorage.readToken();
+    token = await TokenStorage.readToken();
     if (token == null) {
       setStateWithMinSplashTime(stopWatch, () {
         tokenLoadingFailed = true;
       });
       return;
     }
+    setStateWithMinSplashTime(stopWatch, () {
+      subjects = []; // TODO: Fetch!!
+      shouldGoToSubjectsPage = true;
+    });
     // load subjects here.
   }
 
-  void setStateWithMinSplashTime(Stopwatch stopwatch, VoidCallback stateUpdateFn) async {
-    await Future.delayed(Duration(milliseconds: milliSecondsToWaitAfterResult(stopwatch)));
+  void setStateWithMinSplashTime(
+      Stopwatch stopwatch, VoidCallback stateUpdateFn) async {
+    await Future.delayed(
+        Duration(milliseconds: milliSecondsToWaitAfterResult(stopwatch)));
     setState(stateUpdateFn);
   }
 
@@ -55,6 +63,15 @@ class _SplashPageState extends State<SplashPage> {
         Navigator.of(context).pushReplacementNamed("/credentials");
       });
     }
+
+    if (shouldGoToSubjectsPage) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed("/subjects",
+            arguments:
+                SubjectsPageArguments(subjects: subjects, token: token!));
+      });
+    }
+
     return SplashView(
       logo: Image.asset(
         "assets/logo-no-background.png",
