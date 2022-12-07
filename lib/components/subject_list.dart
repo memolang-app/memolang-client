@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:memolang/components/SubjectCard.dart';
 import 'package:memolang/models/subject.dart';
 
 class SubjectList extends StatelessWidget {
   final List<Subject>? subjects;
+  final Future<void> Function(Subject) onFlashCardAddPressed;
 
-  const SubjectList({required this.subjects});
+  const SubjectList({required this.subjects, required this.onFlashCardAddPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +23,7 @@ class SubjectList extends StatelessWidget {
       children: subjects!
           .map((subject) => Padding(
             padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-            child: Card(
-                  child: Container(
-                    constraints: BoxConstraints(maxWidth: 400),
-                    child: Center(
-                        child: Text(subject.name),
-                    ),
-                  ),
-                ),
+            child: SubjectCard(subject: subject, onFlashCardAddPressed: onFlashCardAddPressed),
           ))
           .toList(),
     );

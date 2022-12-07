@@ -19,10 +19,11 @@ class SubjectsPage extends StatefulWidget {
 class _SubjectsPageState extends State<SubjectsPage> {
   SubjectsPageArguments? subjectsPageArguments;
   TextEditingController subjectNameInput = TextEditingController();
+  TextEditingController flashCardQuestionInput = TextEditingController();
+  TextEditingController flashCardAnswerInput = TextEditingController();
   SubjectClient subjectClient = SubjectClient();
 
-  void _submitForm(subjectName) async {
-    print('token is ${subjectsPageArguments?.token}');
+  void _submitNewSubjectForm(String subjectName) async {
     var subject = await subjectClient.createSubject(subjectsPageArguments!.token, subjectName);
     if (subject != null) {
       Navigator.of(context).pop(subject);
@@ -43,7 +44,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
                 children: <Widget>[
                   TextField(
                       onSubmitted: (value) {
-                        _submitForm(subjectNameInput.text);
+                        _submitNewSubjectForm(subjectNameInput.text);
                       },
                       controller: subjectNameInput,
                       autofocus: true,
@@ -61,7 +62,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
                   icon: const Icon(Icons.save),
                   label: const Text("Save"),
                   onPressed: () {
-                    _submitForm(subjectNameInput.text);
+                    _submitNewSubjectForm(subjectNameInput.text);
                   },
                 ),
               ),
@@ -79,6 +80,86 @@ class _SubjectsPageState extends State<SubjectsPage> {
             ],
           ),
     );
+  }
+
+  void setStateWithNewSubject(Subject updatedSubject) {
+    var foundSubject = subjectsPageArguments!.subjects.firstWhere((element) => element.id == updatedSubject.id);
+    setState(() {
+      foundSubject.flashCards = updatedSubject.flashCards;
+    });
+  }
+
+  Future<Subject?> _show_new_card_dialog(Subject subject) {
+    return showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: const Text('Create new Flash Card'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  TextField(
+                      onSubmitted: (value) {
+                        _submitNewFlashCardForm(subject.id);
+                      },
+                      controller: flashCardQuestionInput,
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        labelText: "Question",
+                      )),
+                  TextField(
+                      onSubmitted: (value) {
+                        _submitNewFlashCardForm(subject.id);
+                      },
+                      controller: flashCardAnswerInput,
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        labelText: "answer",
+                      )),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 8.0, horizontal: 0),
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.save),
+                  label: const Text("Save"),
+                  onPressed: () {
+                    _submitNewFlashCardForm(subject.id);
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 8.0, horizontal: 0),
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.cancel),
+                  label: const Text("Cancel"),
+                  onPressed: () {
+                    Navigator.of(context).pop(null);
+                  },
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Future<Subject?> _submitNewFlashCardForm(int subjectId) async {
+    var subject = await subjectClient.addFlashCard(
+        subjectsPageArguments!.token,
+        subjectId,
+        flashCardQuestionInput.text,
+        flashCardAnswerInput.text,
+    );
+    if (subject != null) {
+      Navigator.of(context).pop(subject);
+    } else {
+      Navigator.of(context).pop();
+    }
+    subjectNameInput.clear();
   }
 
   @override
@@ -100,7 +181,17 @@ class _SubjectsPageState extends State<SubjectsPage> {
         automaticallyImplyLeading: false,
       ),
       body: Center(
-        child: SubjectList(subjects: subjectsPageArguments?.subjects),
+        child: SubjectList(
+            subjects: subjectsPageArguments?.subjects,
+            onFlashCardAddPressed: (subject) async {
+              var newSubject = await _show_new_card_dialog(subject);
+              if (newSubject != null) {
+                setStateWithNewSubject(newSubject);
+                flashCardAnswerInput.clear();
+                flashCardQuestionInput.clear();
+              }
+            },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
