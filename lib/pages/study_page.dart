@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:memolang/clients/subject_client.dart';
 import 'package:memolang/components/circular_icon_button.dart';
 import 'package:memolang/models/subject.dart';
 import 'package:memolang/style.dart';
@@ -22,11 +23,38 @@ class _StudyPageState extends State<StudyPage> {
   StudyPageArguments? args;
   int flashCardIndex = 0;
   bool showAnswer = false;
+  SubjectClient client = SubjectClient();
 
   void goToSplashAfterRender() {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       Navigator.of(context).pushReplacementNamed("/");
     });
+  }
+
+  void onReviewButtonClicked(bool remembered) async {
+    var reviewSubmitted = await sendReviewRequest(remembered);
+    if (!reviewSubmitted) {
+      goToSplashAfterRender();
+    }
+    setStateToNextCardOrSplash();
+  }
+
+  void setStateToNextCardOrSplash() {
+    setState(() {
+      if (flashCardIndex >= (args?.subject.flashCardsToStudy.length ?? 0) - 1) {
+        goToSplashAfterRender();
+        return;
+      }
+      flashCardIndex += 1;
+    });
+  }
+
+  Future<bool> sendReviewRequest(bool remembered) async {
+    if (args == null) {
+      return false;
+    }
+    return await client.submitReview(args!.token, args!.subject.id,
+        args!.subject.flashCardsToStudy[flashCardIndex].id!, remembered);
   }
 
   @override
@@ -39,6 +67,12 @@ class _StudyPageState extends State<StudyPage> {
     }
     return Scaffold(
       appBar: AppBar(title: Text(args?.subject.name ?? "")),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.home),
+        onPressed: () {
+          goToSplashAfterRender();
+        },
+      ),
       body: Center(
         child: Container(
           constraints: BoxConstraints(maxHeight: cardWidth),
@@ -68,9 +102,9 @@ class _StudyPageState extends State<StudyPage> {
                     padding: const EdgeInsets.all(padding),
                     child: Text(
                       (showAnswer)
-                          ? args?.subject.flashCards[flashCardIndex].answer ??
+                          ? args?.subject.flashCardsToStudy[flashCardIndex].answer ??
                               ''
-                          : args?.subject.flashCards[flashCardIndex].question ??
+                          : args?.subject.flashCardsToStudy[flashCardIndex].question ??
                               '',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
@@ -85,23 +119,15 @@ class _StudyPageState extends State<StudyPage> {
     );
   }
 
-  void setStateToNextCard() {
-    setState(() {
-      if (flashCardIndex >= (args?.subject.flashCards.length ?? 0) - 1) {
-        goToSplashAfterRender();
-        return;
-      }
-      flashCardIndex += 1;
-    });
-  }
-
   Widget _renderButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        CircularIconButton(onPressed: () {
-          setStateToNextCard();
-        }, icon: Icons.close),
+        CircularIconButton(
+            onPressed: () {
+              onReviewButtonClicked(false);
+            },
+            icon: Icons.close),
         ElevatedButton(
             onPressed: () {
               setState(() {
@@ -110,9 +136,11 @@ class _StudyPageState extends State<StudyPage> {
             },
             style: ElevatedButton.styleFrom(primary: Colors.yellow[800]),
             child: Text((showAnswer) ? "Show Question" : "Show Answer")),
-        CircularIconButton(onPressed: () {
-          setStateToNextCard();
-        }, icon: Icons.check),
+        CircularIconButton(
+            onPressed: () {
+              onReviewButtonClicked(true);
+            },
+            icon: Icons.check),
       ],
     );
   }

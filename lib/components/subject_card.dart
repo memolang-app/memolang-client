@@ -3,61 +3,82 @@ import 'package:memolang/models/subject.dart';
 import 'package:memolang/pages/study_page.dart';
 import 'package:memolang/style.dart';
 
-
 class SubjectCard extends StatelessWidget {
   final Subject subject;
   final String token;
   final Future<void> Function(Subject) onFlashCardAddPressed;
 
-  const SubjectCard({required this.subject, required this.onFlashCardAddPressed, required this.token});
+  const SubjectCard(
+      {required this.subject,
+      required this.onFlashCardAddPressed,
+      required this.token});
 
   int countFlashCardsOfStage(String stage) {
     return subject.flashCards
         .fold(0, (sum, card) => (card.stage == stage) ? sum + 1 : sum);
   }
 
-  Widget _renderCardCountRow(String label, String stage) => Padding(
-    padding: const EdgeInsets.all(padding),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Chip(
-          padding: EdgeInsets.all(0),
-          label: Text(label),
+  Widget _renderCardCountRow(String label, String stage) =>
+      _renderKeyValueRow(label, countFlashCardsOfStage(stage).toString());
+
+  Widget _renderKeyValueRow(String key, String value) => Padding(
+        padding: const EdgeInsets.all(padding),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Chip(
+              padding: EdgeInsets.all(0),
+              label: Text(key),
+            ),
+            Chip(
+              padding: EdgeInsets.all(0),
+              label: Text(value),
+            )
+          ],
         ),
-        Chip(
-          padding: EdgeInsets.all(0),
-          label: Text(countFlashCardsOfStage(stage).toString()),
-        )
-      ],
-    ),
-  );
+      );
 
   Widget _renderButtons(BuildContext context) => Padding(
-    padding: const EdgeInsets.all(padding  * 2),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        ElevatedButton.icon(
-            onPressed: () {
-              onFlashCardAddPressed(subject);
-            },
-            icon: const Icon(Icons.add),
-            label: const Text('Add card')
+        padding: const EdgeInsets.all(padding * 2),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton.icon(
+                onPressed: () {
+                  onFlashCardAddPressed(subject);
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Add card')),
+            ElevatedButton.icon(
+                onPressed: () {
+                  if (subject.flashCardsToStudy.isEmpty) {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        content: const Text("There is no card to study in this subject for today"),
+                        actions: <Widget>[
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(ctx).pop();
+                            },
+                            child: const Text("Ok"),
+                          ),
+                        ],
+                      ),
+                    );
+                    return;
+                  }
+                  Navigator.pushReplacementNamed(context, '/study',
+                      arguments: StudyPageArguments(
+                        subject: subject,
+                        token: token,
+                      ));
+                },
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('Study')),
+          ],
         ),
-        ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/study', arguments: StudyPageArguments(
-                subject: subject,
-                token: token,
-              ));
-            },
-            icon: const Icon(Icons.play_arrow),
-            label: const Text('Study')
-        ),
-      ],
-    ),
-  );
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +112,9 @@ class SubjectCard extends StatelessWidget {
               _renderCardCountRow('Study every month', 'EVERY_MONTH'),
               const Divider(height: padding),
               _renderCardCountRow('Learnt', 'DONE'),
+              const Divider(height: padding),
+              _renderKeyValueRow('Cards To Study',
+                  subject.flashCardsToStudy.length.toString()),
               const Divider(height: padding),
               _renderButtons(context)
             ],

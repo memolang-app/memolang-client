@@ -11,6 +11,16 @@ class SubjectClient extends BaseHttpClient {
         .toList();
   }
 
+  Future<bool> submitReview(
+      String token, int subjectId, int cardId, bool remembered) async {
+    var response = await post(
+      "/api/study-subject/$subjectId/cards/$cardId/reviews",
+      {"known": remembered},
+      token: token,
+    );
+    return response.statusCode == 200;
+  }
+
   Future<Subject?> createSubject(String token, String name) async {
     var response = await post(
       "/api/study-subject",

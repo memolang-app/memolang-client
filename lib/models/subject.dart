@@ -18,6 +18,10 @@ class Subject {
   int id;
   String name;
   List<FlashCard> flashCards;
+  List<FlashCard> flashCardsToStudy = [];
 
-  Subject({required this.name, required this.id, required this.flashCards });
+  Subject({required this.name, required this.id, required this.flashCards}) {
+    flashCardsToStudy =
+        flashCards.where((card) => card.shouldBeStudied).toList();
+  }
 }
