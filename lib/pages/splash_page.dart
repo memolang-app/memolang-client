@@ -18,7 +18,7 @@ class _SplashPageState extends State<SplashPage> {
   var shouldGoToSubjectsPage = false;
   String? token;
   var subjects = <Subject>[];
-  static const splashMinMilliSeconds = 5000;
+  static const splashMinMilliSeconds = 3000;
   var subjectClient = SubjectClient();
 
   Future<void> loadSubjects() async {

@@ -3,12 +3,14 @@ class FlashCard {
   String question;
   String answer;
   String stage;
+  bool shouldBeStudied;
 
   FlashCard({
     this.id,
     required this.question,
     required this.answer,
-    required this.stage
+    required this.stage,
+    required this.shouldBeStudied,
   });
 }
 

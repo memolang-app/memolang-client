@@ -182,6 +182,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
       ),
       body: Center(
         child: SubjectList(
+          token: subjectsPageArguments?.token ?? '',
             subjects: subjectsPageArguments?.subjects,
             onFlashCardAddPressed: (subject) async {
               var newSubject = await _show_new_card_dialog(subject);

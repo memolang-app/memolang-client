@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:memolang/models/subject.dart';
+import 'package:memolang/pages/study_page.dart';
 import 'package:memolang/style.dart';
-import 'package:badges/badges.dart';
 
 
 class SubjectCard extends StatelessWidget {
   final Subject subject;
+  final String token;
   final Future<void> Function(Subject) onFlashCardAddPressed;
 
-  const SubjectCard({required this.subject, required this.onFlashCardAddPressed});
-  static const double padding = 8.0;
+  const SubjectCard({required this.subject, required this.onFlashCardAddPressed, required this.token});
 
   int countFlashCardsOfStage(String stage) {
     return subject.flashCards
@@ -33,7 +33,7 @@ class SubjectCard extends StatelessWidget {
     ),
   );
 
-  Widget _renderButtons() => Padding(
+  Widget _renderButtons(BuildContext context) => Padding(
     padding: const EdgeInsets.all(padding  * 2),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -46,8 +46,13 @@ class SubjectCard extends StatelessWidget {
             label: const Text('Add card')
         ),
         ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.book),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/study', arguments: StudyPageArguments(
+                subject: subject,
+                token: token,
+              ));
+            },
+            icon: const Icon(Icons.play_arrow),
             label: const Text('Study')
         ),
       ],
@@ -58,7 +63,7 @@ class SubjectCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
+        constraints: const BoxConstraints(maxWidth: cardWidth),
         child: Center(
           child: Column(
             children: [
@@ -87,7 +92,7 @@ class SubjectCard extends StatelessWidget {
               const Divider(height: padding),
               _renderCardCountRow('Learnt', 'DONE'),
               const Divider(height: padding),
-              _renderButtons()
+              _renderButtons(context)
             ],
           ),
         ),

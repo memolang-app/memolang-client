@@ -55,6 +55,7 @@ class SubjectClient extends BaseHttpClient {
         id: cardDynamic['id'] as int,
         question: cardDynamic['question'] as String,
         answer: cardDynamic['answer'] as String,
-        stage: cardDynamic['stage'] as String);
+        stage: cardDynamic['stage'] as String,
+        shouldBeStudied: cardDynamic['shouldBeStudied'] as bool);
   }
 }
