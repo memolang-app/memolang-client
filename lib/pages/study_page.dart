@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:memolang/components/circular_icon_button.dart';
 import 'package:memolang/models/subject.dart';
 import 'package:memolang/style.dart';
 
@@ -40,7 +41,7 @@ class _StudyPageState extends State<StudyPage> {
       appBar: AppBar(title: Text(args?.subject.name ?? "")),
       body: Center(
         child: Container(
-          height: cardWidth,
+          constraints: BoxConstraints(maxHeight: cardWidth),
           width: cardWidth,
           padding: const EdgeInsets.all(padding),
           child: Card(
@@ -71,6 +72,7 @@ class _StudyPageState extends State<StudyPage> {
                               ''
                           : args?.subject.flashCards[flashCardIndex].question ??
                               '',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                   _renderButtons()
@@ -83,35 +85,34 @@ class _StudyPageState extends State<StudyPage> {
     );
   }
 
+  void setStateToNextCard() {
+    setState(() {
+      if (flashCardIndex >= (args?.subject.flashCards.length ?? 0) - 1) {
+        goToSplashAfterRender();
+        return;
+      }
+      flashCardIndex += 1;
+    });
+  }
+
   Widget _renderButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        ElevatedButton.icon(
-            icon: const Icon(Icons.close),
-            onPressed: () {
-              flashCardIndex += 1;
-              if (flashCardIndex == args?.subject.flashCards.length) {
-                goToSplashAfterRender();
-              }
-            },
-            label: const Text("Forgotten")),
+        CircularIconButton(onPressed: () {
+          setStateToNextCard();
+        }, icon: Icons.close),
         ElevatedButton(
             onPressed: () {
               setState(() {
                 showAnswer = !showAnswer;
               });
             },
+            style: ElevatedButton.styleFrom(primary: Colors.yellow[800]),
             child: Text((showAnswer) ? "Show Question" : "Show Answer")),
-        ElevatedButton.icon(
-            icon: const Icon(Icons.check),
-            onPressed: () {
-              flashCardIndex += 1;
-              if (flashCardIndex == args?.subject.flashCards.length) {
-                goToSplashAfterRender();
-              }
-            },
-            label: const Text("Known")),
+        CircularIconButton(onPressed: () {
+          setStateToNextCard();
+        }, icon: Icons.check),
       ],
     );
   }
