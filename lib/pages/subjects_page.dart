@@ -43,6 +43,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
               child: ListBody(
                 children: <Widget>[
                   TextField(
+                      style: const TextStyle(color: Colors.black),
                       onSubmitted: (value) {
                         _submitNewSubjectForm(subjectNameInput.text);
                       },
@@ -99,6 +100,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
               child: ListBody(
                 children: <Widget>[
                   TextField(
+                      style: const TextStyle(color: Colors.black),
                       onSubmitted: (value) {
                         _submitNewFlashCardForm(subject.id);
                       },
@@ -108,6 +110,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
                         labelText: "Question",
                       )),
                   TextField(
+                      style: const TextStyle(color: Colors.black),
                       onSubmitted: (value) {
                         _submitNewFlashCardForm(subject.id);
                       },
