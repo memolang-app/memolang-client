@@ -2,11 +2,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class BaseHttpClient {
-  static const _host = "http://localhost:8080";
+  static var host = "http://localhost:8080";
 
   Future<http.Response> get(String path, { String? token }) {
     return http.get(
-        Uri.parse(_host + path),
+        Uri.parse(host + path),
         headers: tokenToHeaderMap(token),
     );
   }
@@ -17,7 +17,7 @@ class BaseHttpClient {
     };
     headers.addAll(tokenToHeaderMap(token));
     return http.post(
-      Uri.parse(_host + path),
+      Uri.parse(host + path),
       headers: headers,
       body: jsonEncode(body),
     );
