@@ -44,7 +44,7 @@ class SubjectClient extends BaseHttpClient {
       },
       token: token,
     );
-    if (response.statusCode != 201) {
+    if (![200, 201].contains(response.statusCode)) {
       return null;
     }
     Map<String, dynamic> responseBody = jsonDecode(response.body);

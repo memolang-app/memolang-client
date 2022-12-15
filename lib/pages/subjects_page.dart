@@ -84,9 +84,9 @@ class _SubjectsPageState extends State<SubjectsPage> {
   }
 
   void setStateWithNewSubject(Subject updatedSubject) {
-    var foundSubject = subjectsPageArguments!.subjects.firstWhere((element) => element.id == updatedSubject.id);
     setState(() {
-      foundSubject.flashCards = updatedSubject.flashCards;
+      var index = subjectsPageArguments!.subjects.lastIndexWhere((s) => s.id == updatedSubject.id);
+      subjectsPageArguments!.subjects[index] = updatedSubject;
     });
   }
 
