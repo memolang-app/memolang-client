@@ -21,6 +21,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+      - run: flutter pub get
       - run: flutter pub global activate peanut
       - run: flutter pub global run peanut -b production
       - run: |
