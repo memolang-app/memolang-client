@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memolang/clients/base_http_client.dart';
 import 'package:memolang/pages/credentials_page.dart';
-import 'package:memolang/pages/otp_page.dart';
 import 'package:memolang/pages/splash_page.dart';
 import 'package:memolang/pages/study_page.dart';
 import 'package:memolang/pages/subjects_page.dart';
@@ -15,7 +14,6 @@ void mainWithApiUrl({required String apiUrl}) {
       '/subjects': (ctx) => SubjectsPage(),
       '/credentials': (ctx) => CredentialsPage(),
       '/study': (ctx) => StudyPage(),
-      '/otp': (ctx) => OtpPage(),
     },
     theme: ThemeData(
       scaffoldBackgroundColor: backgroundColor,
