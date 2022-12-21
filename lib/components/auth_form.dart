@@ -2,18 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:memolang/clients/auth_client.dart';
 import 'package:memolang/models/token_storage.dart';
+import 'package:memolang/pages/otp_page.dart';
 import 'package:memolang/pages/splash_page.dart';
 import 'package:memolang/style.dart';
 
-class LoginForm extends StatelessWidget {
-  AuthClient authClient;
+class AuthForm extends StatefulWidget {
+  final AuthClient authClient;
 
-  LoginForm({required this.authClient});
+  AuthForm({required this.authClient});
+
+  @override
+  State<AuthForm> createState() => _AuthFormState();
+}
+
+class _AuthFormState extends State<AuthForm> {
+  bool shouldGoToOtpPage = false;
 
   Duration get loginTime => Duration(milliseconds: 2250);
+  String otpUsername = "";
+  String otpPassword = "";
 
   Future<String?> _login(LoginData data) async {
-    var authResult = await authClient
+    var authResult = await widget.authClient
         .login(Credentials(username: data.name, password: data.password));
     if (authResult.token != null) {
       TokenStorage.writeToken(authResult.token!);
@@ -23,15 +33,14 @@ class LoginForm extends StatelessWidget {
   }
 
   Future<String?> _signupUser(SignupData data) async {
-    var authResult = await authClient.register(Credentials(
-      username: data.name!,
-      password: data.password!,
-    ));
-    if (authResult.token != null) {
-      TokenStorage.writeToken(authResult.token!);
-      return null;
+    var otpError = await widget.authClient.otp(data.name!);
+    if (otpError != null) {
+      return otpError.humanReadableError;
     }
-    return authResult.error;
+    shouldGoToOtpPage = true;
+    otpUsername = data.name!;
+    otpPassword = data.password!;
+    return null;
   }
 
   Future<String?> _recoverPassword(String name) {
@@ -46,24 +55,20 @@ class LoginForm extends StatelessWidget {
     return FlutterLogin(
       onLogin: _login,
       onSignup: _signupUser,
-      userValidator: (username) {
-        if (username == null) {
-          return "This field is required!";
-        }
-        if (username.contains(RegExp(r'\s'))) {
-          return "Username should not contain any whitespace!";
-        }
-        return null;
-      },
       logo: "assets/logo-no-background.png",
       onSubmitAnimationCompleted: () {
+        if (shouldGoToOtpPage) {
+          Navigator.of(context).pushReplacementNamed('/otp',
+              arguments:
+                  OtpPageArgs(email: otpUsername, password: otpPassword));
+          return;
+        }
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => SplashPage(),
         ));
       },
       onRecoverPassword: _recoverPassword,
       hideForgotPasswordButton: true,
-      userType: LoginUserType.name,
       theme: LoginTheme(
           pageColorLight: backgroundColor,
           pageColorDark: backgroundColor,
