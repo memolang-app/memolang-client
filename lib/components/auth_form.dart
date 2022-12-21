@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:memolang/clients/auth_client.dart';
 import 'package:memolang/models/token_storage.dart';
-import 'package:memolang/pages/otp_page.dart';
 import 'package:memolang/pages/splash_page.dart';
 import 'package:memolang/style.dart';
 
@@ -16,11 +15,7 @@ class AuthForm extends StatefulWidget {
 }
 
 class _AuthFormState extends State<AuthForm> {
-  bool shouldGoToOtpPage = false;
-
   Duration get loginTime => Duration(milliseconds: 2250);
-  String otpUsername = "";
-  String otpPassword = "";
 
   Future<String?> _login(LoginData data) async {
     var authResult = await widget.authClient
@@ -32,14 +27,11 @@ class _AuthFormState extends State<AuthForm> {
     return authResult.error;
   }
 
-  Future<String?> _signupUser(SignupData data) async {
+  Future<String?> _sendOtp(SignupData data) async {
     var otpError = await widget.authClient.otp(data.name!);
     if (otpError != null) {
       return otpError.humanReadableError;
     }
-    shouldGoToOtpPage = true;
-    otpUsername = data.name!;
-    otpPassword = data.password!;
     return null;
   }
 
@@ -50,19 +42,25 @@ class _AuthFormState extends State<AuthForm> {
     });
   }
 
+  Future<String?> _onConfirmSignup(String otp, LoginData data) async {
+    var result = await widget.authClient.register(
+        Credentials(username: data.name, password: data.password), otp);
+    if (result.error != null) {
+      return result.error!;
+    }
+    await TokenStorage.writeToken(result.token!);
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FlutterLogin(
       onLogin: _login,
-      onSignup: _signupUser,
+      onSignup: _sendOtp,
+      onConfirmSignup: _onConfirmSignup,
+      confirmSignupKeyboardType: TextInputType.number,
       logo: "assets/logo-no-background.png",
       onSubmitAnimationCompleted: () {
-        if (shouldGoToOtpPage) {
-          Navigator.of(context).pushReplacementNamed('/otp',
-              arguments:
-                  OtpPageArgs(email: otpUsername, password: otpPassword));
-          return;
-        }
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => SplashPage(),
         ));
