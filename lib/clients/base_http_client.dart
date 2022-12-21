@@ -23,6 +23,18 @@ class BaseHttpClient {
     );
   }
 
+  Future<http.Response> put(String path, Map<String, dynamic> body, {String? token}) {
+    var headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    headers.addAll(tokenToHeaderMap(token));
+    return http.put(
+      Uri.parse(host + path),
+      headers: headers,
+      body: jsonEncode(body),
+    );
+  }
+
   Map<String, String> tokenToHeaderMap(String? token) {
     if (token == null) {
       return {};

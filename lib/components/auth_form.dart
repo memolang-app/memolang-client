@@ -15,8 +15,6 @@ class AuthForm extends StatefulWidget {
 }
 
 class _AuthFormState extends State<AuthForm> {
-  Duration get loginTime => Duration(milliseconds: 2250);
-
   Future<String?> _login(LoginData data) async {
     var authResult = await widget.authClient
         .login(Credentials(username: data.name, password: data.password));
@@ -28,18 +26,28 @@ class _AuthFormState extends State<AuthForm> {
   }
 
   Future<String?> _sendOtp(SignupData data) async {
-    var otpError = await widget.authClient.otp(data.name!);
+    var otpError = await widget.authClient.registrationOtp(data.name!);
     if (otpError != null) {
       return otpError.humanReadableError;
     }
     return null;
   }
 
-  Future<String?> _recoverPassword(String name) {
-    debugPrint('Name: $name');
-    return Future.delayed(loginTime).then((_) {
-      return null;
-    });
+  Future<String?> _onRecoverPassword(String email) async {
+    var result = await widget.authClient.passwordResetOtp(email);
+    if (result != null) {
+      return result.humanReadableError;
+    }
+    return null;
+  }
+
+  Future<String?> _onConfirmRecover(String otp, LoginData data) async {
+    var result = await widget.authClient.resetPassword(
+        Credentials(username: data.name, password: data.password), otp);
+    if (result.error != null) {
+      return result.error;
+    }
+    return null;
   }
 
   Future<String?> _onConfirmSignup(String otp, LoginData data) async {
@@ -51,6 +59,8 @@ class _AuthFormState extends State<AuthForm> {
     await TokenStorage.writeToken(result.token!);
     return null;
   }
+
+  // Future<String?> _on_recov
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +75,8 @@ class _AuthFormState extends State<AuthForm> {
           builder: (context) => SplashPage(),
         ));
       },
-      onRecoverPassword: _recoverPassword,
-      hideForgotPasswordButton: true,
+      onRecoverPassword: _onRecoverPassword,
+      onConfirmRecover: _onConfirmRecover,
       theme: LoginTheme(
           pageColorLight: backgroundColor,
           pageColorDark: backgroundColor,
