@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memolang/clients/auth_client.dart';
-import 'package:memolang/components/login_form.dart';
+import 'package:memolang/components/auth_form.dart';
 import 'package:memolang/style.dart';
 
 class CredentialsPage extends StatelessWidget {
@@ -12,7 +12,7 @@ class CredentialsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Welcome'),
       ),
-      body: LoginForm(authClient: authClient),
+      body: AuthForm(authClient: authClient),
     );
   }
 }
