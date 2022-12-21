@@ -36,6 +36,9 @@ class _StudyPageState extends State<StudyPage> {
     if (!reviewSubmitted) {
       goToSplashAfterRender();
     }
+    setState(() {
+      showAnswer = false;
+    });
     setStateToNextCardOrSplash();
   }
 
