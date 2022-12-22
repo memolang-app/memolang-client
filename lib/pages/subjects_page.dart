@@ -3,6 +3,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:memolang/clients/subject_client.dart';
 import 'package:memolang/components/subject_list.dart';
 import 'package:memolang/models/subject.dart';
+import 'package:memolang/models/token_storage.dart';
+import 'package:memolang/style.dart';
 
 class SubjectsPageArguments {
   List<Subject> subjects;
@@ -181,7 +183,23 @@ class _SubjectsPageState extends State<SubjectsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Study Subjects'),
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            ListTile(
+              title: const Text('Log Out'),
+              onTap: () async {
+                await TokenStorage.deleteToken();
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(context).pushReplacementNamed("/");
+                });
+              },
+            ),
+          ],
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
