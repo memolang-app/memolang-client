@@ -43,6 +43,7 @@ dependencies:
   flutter_secure_storage: ^6.1.0
   flutter_login: ^4.1.0
   badges: ^2.0.3
+  pie_chart: ^5.3.2
 
 dev_dependencies:
   flutter_test:
