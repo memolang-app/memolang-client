@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:memolang/clients/subject_client.dart';
@@ -105,10 +107,8 @@ class _StudyPageState extends State<StudyPage> {
                     padding: const EdgeInsets.all(padding),
                     child: Text(
                       (showAnswer)
-                          ? args?.subject.flashCardsToStudy[flashCardIndex].answer ??
-                              ''
-                          : args?.subject.flashCardsToStudy[flashCardIndex].question ??
-                              '',
+                          ? const Utf8Decoder().convert((args?.subject.flashCardsToStudy[flashCardIndex].answer ?? '').codeUnits)
+                          : const Utf8Decoder().convert((args?.subject.flashCardsToStudy[flashCardIndex].question ?? '').codeUnits),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),

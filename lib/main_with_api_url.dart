@@ -18,6 +18,7 @@ void mainWithApiUrl({required String apiUrl}) {
     },
     theme: ThemeData(
       scaffoldBackgroundColor: backgroundColor,
+      fontFamily: 'playfair',
       appBarTheme: AppBarTheme(
         backgroundColor: red,
         centerTitle: true,

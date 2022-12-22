@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:memolang/models/subject.dart';
 import 'package:memolang/pages/study_page.dart';
@@ -100,7 +102,7 @@ class SubjectCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  subject.name,
+                  const Utf8Decoder().convert(subject.name.codeUnits),
                   style: TextStyle(
                     color: red,
                     fontWeight: FontWeight.bold,
