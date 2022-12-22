@@ -103,6 +103,8 @@ class _StudyPageState extends State<StudyPage> {
                     ),
                   ),
                   const Divider(height: padding),
+                  Text('Card ${flashCardIndex + 1} out of ${args?.subject.flashCardsToStudy.length ?? 1}'),
+                  const Divider(height: padding),
                   Padding(
                     padding: const EdgeInsets.all(padding),
                     child: Text(
