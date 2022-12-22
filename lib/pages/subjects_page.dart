@@ -184,17 +184,19 @@ class _SubjectsPageState extends State<SubjectsPage> {
         automaticallyImplyLeading: false,
       ),
       body: Center(
-        child: SubjectList(
-          token: subjectsPageArguments?.token ?? '',
-            subjects: subjectsPageArguments?.subjects,
-            onFlashCardAddPressed: (subject) async {
-              var newSubject = await _show_new_card_dialog(subject);
-              if (newSubject != null) {
-                setStateWithNewSubject(newSubject);
-                flashCardAnswerInput.clear();
-                flashCardQuestionInput.clear();
-              }
-            },
+        child: SingleChildScrollView(
+          child: SubjectList(
+            token: subjectsPageArguments?.token ?? '',
+              subjects: subjectsPageArguments?.subjects,
+              onFlashCardAddPressed: (subject) async {
+                var newSubject = await _show_new_card_dialog(subject);
+                if (newSubject != null) {
+                  setStateWithNewSubject(newSubject);
+                  flashCardAnswerInput.clear();
+                  flashCardQuestionInput.clear();
+                }
+              },
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

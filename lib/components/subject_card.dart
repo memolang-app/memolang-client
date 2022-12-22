@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memolang/models/subject.dart';
 import 'package:memolang/pages/study_page.dart';
 import 'package:memolang/style.dart';
+import 'package:pie_chart/pie_chart.dart';
 
 class SubjectCard extends StatelessWidget {
   final Subject subject;
@@ -13,13 +14,13 @@ class SubjectCard extends StatelessWidget {
       required this.onFlashCardAddPressed,
       required this.token});
 
-  int countFlashCardsOfStage(String stage) {
+  double _countCardsOfStage(String stage) {
     return subject.flashCards
         .fold(0, (sum, card) => (card.stage == stage) ? sum + 1 : sum);
   }
 
   Widget _renderCardCountRow(String label, String stage) =>
-      _renderKeyValueRow(label, countFlashCardsOfStage(stage).toString());
+      _renderKeyValueRow(label, _countCardsOfStage(stage).toString());
 
   Widget _renderKeyValueRow(String key, String value) => Padding(
         padding: const EdgeInsets.all(padding),
@@ -82,6 +83,14 @@ class SubjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, double> chartDataMap = {
+      'Every Day': _countCardsOfStage('EVERY_DAY'),
+      'Every Other Day': _countCardsOfStage('EVERY_TWO_DAY'),
+      'Every Week': _countCardsOfStage('EVERY_WEEK'),
+      'Every Other Week': _countCardsOfStage('EVERY_TWO_WEEK'),
+      'Every Month': _countCardsOfStage('EVERY_MONTH'),
+      'Learnt': _countCardsOfStage('DONE'),
+    };
     return Card(
       child: Container(
         constraints: const BoxConstraints(maxWidth: cardWidth),
@@ -101,17 +110,13 @@ class SubjectCard extends StatelessWidget {
                 ),
               ),
               const Divider(height: padding),
-              _renderCardCountRow('Study Every Day', 'EVERY_DAY'),
-              const Divider(height: padding),
-              _renderCardCountRow('Study Every Two Day', 'EVERY_TWO_DAY'),
-              const Divider(height: padding),
-              _renderCardCountRow('Study Every Week', 'EVERY_WEEK'),
-              const Divider(height: padding),
-              _renderCardCountRow('Study Every Two Week', 'EVERY_TWO_WEEK'),
-              const Divider(height: padding),
-              _renderCardCountRow('Study every month', 'EVERY_MONTH'),
-              const Divider(height: padding),
-              _renderCardCountRow('Learnt', 'DONE'),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: PieChart(
+                    dataMap: chartDataMap,
+                    chartValuesOptions: const ChartValuesOptions(decimalPlaces: 0)
+                ),
+              ),
               const Divider(height: padding),
               _renderKeyValueRow('Cards To Study',
                   subject.flashCardsToStudy.length.toString()),
