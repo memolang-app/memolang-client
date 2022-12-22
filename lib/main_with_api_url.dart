@@ -9,6 +9,7 @@ import 'package:memolang/style.dart';
 void mainWithApiUrl({required String apiUrl}) {
   BaseHttpClient.host = apiUrl;
   runApp(MaterialApp(
+    title: 'Memolang',
     routes: {
       '/': (ctx) => SplashPage(),
       '/subjects': (ctx) => SubjectsPage(),
