@@ -29,4 +29,4 @@ jobs:
       - run: flutter pub global run peanut -b production
       - run: |
           git checkout production
-          git push origin production
+          git push -f origin production
