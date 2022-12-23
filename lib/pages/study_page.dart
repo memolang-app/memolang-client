@@ -97,7 +97,6 @@ class _StudyPageState extends State<StudyPage> {
                           color: red,
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
-                          letterSpacing: 2,
                         ),
                       ),
                     ),
