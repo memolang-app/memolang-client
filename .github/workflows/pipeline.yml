@@ -23,9 +23,10 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
       - run: flutter pub global activate peanut
-      - run: flutter pub global run peanut -b production
       - run: |
           git config --global user.name 'Pedram Hajesmaeeli'
           git config --global user.email 'pedram.esmaeeli@gmail.com'
+      - run: flutter pub global run peanut -b production
+      - run: |
           git checkout production
           git push origin production
