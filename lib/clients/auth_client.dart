@@ -22,10 +22,10 @@ class AuthResult {
   AuthResult({this.token, this.error});
 }
 
-class OtpError {
+class ClientError {
   String humanReadableError;
 
-  OtpError({required this.humanReadableError});
+  ClientError({required this.humanReadableError});
 }
 
 class Credentials {
@@ -54,24 +54,24 @@ class AuthClient extends BaseHttpClient {
     }
   }
 
-  Future<OtpError?> registrationOtp(String email) async {
+  Future<ClientError?> registrationOtp(String email) async {
     var response = await super.post("/api/users/otp", {"claimedEmail": email});
     if (response.statusCode == 409) {
-      return OtpError(humanReadableError: AuthError.usernameTaken);
+      return ClientError(humanReadableError: AuthError.usernameTaken);
     } else if (response.statusCode == 200) {
       return null;
     } else {
-      return OtpError(humanReadableError: AuthError.unknownError);
+      return ClientError(humanReadableError: AuthError.unknownError);
     }
   }
 
-  Future<OtpError?> passwordResetOtp(String email) async {
+  Future<ClientError?> passwordResetOtp(String email) async {
     var response =
         await super.post("/api/users/login/otp", {"claimedEmail": email});
     if (response.statusCode == 200) {
       return null;
     } else {
-      return OtpError(humanReadableError: AuthError.unknownError);
+      return ClientError(humanReadableError: AuthError.unknownError);
     }
   }
 
@@ -109,5 +109,14 @@ class AuthClient extends BaseHttpClient {
 
   String _extractTokenFromBody(Response response) {
     return jsonDecode(response.body)['token'] as String;
+  }
+
+  Future<ClientError?> deleteUser(String token) async {
+    var response = await super.delete("/api/users", token);
+    if (response.statusCode == 204) {
+      return null;
+    } else {
+      return ClientError(humanReadableError: AuthError.unknownError);
+    }
   }
 }

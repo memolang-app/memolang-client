@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:memolang/clients/auth_client.dart';
 import 'package:memolang/clients/subject_client.dart';
 import 'package:memolang/components/subject_list.dart';
 import 'package:memolang/models/subject.dart';
 import 'package:memolang/models/token_storage.dart';
 import 'package:memolang/style.dart';
+import 'package:confirm_dialog/confirm_dialog.dart';
 
 class SubjectsPageArguments {
   List<Subject> subjects;
@@ -24,6 +26,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
   TextEditingController flashCardQuestionInput = TextEditingController();
   TextEditingController flashCardAnswerInput = TextEditingController();
   SubjectClient subjectClient = SubjectClient();
+  AuthClient authClient = AuthClient();
 
   void _submitNewSubjectForm(String subjectName) async {
     var subject = await subjectClient.createSubject(subjectsPageArguments!.token, subjectName);
@@ -167,6 +170,13 @@ class _SubjectsPageState extends State<SubjectsPage> {
     subjectNameInput.clear();
   }
 
+  Future<void> _logout() async {
+    await TokenStorage.deleteToken();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      Navigator.of(context).pushReplacementNamed("/");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     subjectsPageArguments = (subjectsPageArguments == null)
@@ -189,15 +199,36 @@ class _SubjectsPageState extends State<SubjectsPage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: red,
+              ),
+              child: const Text(''),
+            ),
+
             ListTile(
               title: const Text('Log Out'),
               onTap: () async {
-                await TokenStorage.deleteToken();
-                SchedulerBinding.instance.addPostFrameCallback((_) {
-                  Navigator.of(context).pushReplacementNamed("/");
-                });
+                await _logout();
               },
             ),
+
+            ListTile(
+              title: const Text('⚠️ Delete account'),
+              onTap: () async {
+                if (await confirm(context)) {
+                  var error = await authClient.deleteUser((await TokenStorage.readToken())!);
+                  if (error != null) {
+                    showDialog(context: context, builder: (BuildContext context) {
+                      return AlertDialog(title: Text(error.humanReadableError));
+                    });
+                    return;
+                  }
+                  await _logout();
+                }
+              },
+            ),
+
           ],
         ),
       ),
